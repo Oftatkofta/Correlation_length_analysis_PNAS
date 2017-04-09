@@ -13,6 +13,7 @@ If the image mosaic is too large to fit in to RAM, there is an option to stitch 
 All tiff file reading/writing and metadata is handled by  [tifffile.py](http://www.lfd.uci.edu/~gohlke/code/tifffile.py.html)
 
 #Cvv_analysis
+
 Script to perform PIV analysis (with openPIV), and to calculate the alignment index, mean square velocity, Root mean square velocity, the instantaneous order parameter, and the vectorial angular correlation length from the PIV data.
 
 The alignment index is defined as the dot product of a velocity vector (vextor_x) and the average velocity vector (vector_0) for the frame, divided by the product of their magnitudes. Like so: alignment_index = (vector_x dot vector_0)/(|vector_x||vector_0|).
