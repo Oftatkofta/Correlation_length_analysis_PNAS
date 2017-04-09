@@ -562,7 +562,7 @@ for fname in analysisfiles:
                                                                           r_max=300,
                                                                           r_step=1,
                                                                           n_sigma = 5,
-                                                                          intervalWidth=5,
+                                                                          intervalWidth=2,
                                                                           saveFigFlag=False)
 
     outfile = open(outdir+fname[:-4]+"_all_data.pickle", 'w')
