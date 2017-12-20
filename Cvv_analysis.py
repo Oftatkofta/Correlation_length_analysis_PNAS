@@ -14,15 +14,19 @@ import csv
 import pickle
 
 
-def openPIV_array_processor_median(arr, stopFrame, startFrame=0, frameSamplingInterval=1, **piv_params):
+def openPIV_array_processor_median(arr, stopFrame, startFrame=0,
+                                   frameSamplingInterval=1, **piv_params):
     """
-    The function first runs a gliding 3-frame temporal median on every pixel to smooth out noise and to remove fast
-    moving debree that is not migrating cells.
-    Then it does PIV analysis between every n frames in the smoothed time lapse.
-    It returns the u and v components of the velocity vectors as two (smaller) numpy arrays.
-    Two additional arrays with the x and y coordinates corresponding to the centers of the search windows in the
+    The function first runs a gliding 3-frame temporal median on every pixel to
+    smooth out noise and to remove fast moving debris that is not migrating
+    cells. Then it does PIV analysis between every n frames in the smoothed time
+    lapse. It returns the u and v components of the velocity vectors as two 
+    (smaller) numpy arrays. Two additional arrays with the x and y 
+    coordinates corresponding to the centers of the search windows in the 
     original input array are also returned.
-    This function should not be run on data that has already been smoothed.
+    
+    This function should not be run on data that has already been smoothed. 
+
 
     :param arr:
         (3d numpy array) with a shape of (t, y, x) of type np.int32
@@ -34,10 +38,13 @@ def openPIV_array_processor_median(arr, stopFrame, startFrame=0, frameSamplingIn
         (int) do PIV between every n frames
     :param piv_params:
         (dict) parameters for the openPIV function extended_search_area_piv
+    
     :return:
-        u_component_array, v_component_array, original_x_coord_array, original_y_coord_array
+        u_component_array, v_component_array, original_x_coord_array,
+        original_y_coord_array
 
     """
+    
     assert (startFrame < stopFrame) and (stopFrame <= arr.shape[0])
 
     n_frames = 1 + (stopFrame - startFrame - 4) // frameSamplingInterval
@@ -55,31 +62,33 @@ def openPIV_array_processor_median(arr, stopFrame, startFrame=0, frameSamplingIn
 
         if frame >= (stopFrame - 4):
             break
-
-        frame_a = np.median(arr[frame:frame + 3], axis=0).astype(np.int32) #median of frames n1,n2,n3
-        frame_b = np.median(arr[frame + 1:frame + 4], axis=0).astype(np.int32) #median of frames n2,n3,n4
+        
+        #median of frames n1,n2,n3
+        frame_a = np.median(arr[frame:frame + 3], axis=0).astype(np.int32) 
+        #median of frames n2,n3,n4
+        frame_b = np.median(arr[frame + 1:frame + 4], axis=0).astype(np.int32)
 
         #the output arrays are modified in-place with the PIV data
         out_u[frame], out_v[frame] = openpiv.process.extended_search_area_piv(frame_a, frame_b,
-                                                                                         window_size=piv_params[
-                                                                                             "window_size"],
-                                                                                         overlap=piv_params["overlap"],
-                                                                                         dt=piv_params["dt"],
-                                                                                         search_area_size=piv_params[
-                                                                                             "search_area_size"],
-                                                                                         sig2noise_method=None
-                                                                                             )
+                                                                              window_size=piv_params["window_size"],
+                                                                              overlap=piv_params["overlap"],
+                                                                              dt=piv_params["dt"],
+                                                                              search_area_size=piv_params["search_area_size"],
+                                                                              sig2noise_method=None
+                                                                              )
     return out_u, out_v, x, y
 
 
 def openPIV_array_processor(arr, stopFrame, startFrame=0, frameSamplingInterval=1, **piv_params):
     """
     The function does PIV analysis between every n frames in input array.
-    It returns the u and v components of the velocity vectors as two (smaller) numpy arrays.
-    Two additional arrays with the x and y coordinates corresponding to the centers of the search windows in the
-    original input array are also returned.
+    It returns the u and v components of the velocity vectors as two (smaller)
+    numpy arrays. Two additional arrays with the x and y coordinates
+    corresponding to the centers of the search windows in the original input
+    array are also returned.
 
-    This function should be run on data that has already been smoothed, or when smoothing is undesirable.
+    This function should be run on data that has already been smoothed, or when
+    smoothing is undesirable.
 
     :param arr:
         (3D numpy array) with a shape of (t, y, x) of type np.int32
@@ -92,7 +101,8 @@ def openPIV_array_processor(arr, stopFrame, startFrame=0, frameSamplingInterval=
     :param piv_params:
         (dict) parameters for the openPIV function extended_search_area_piv
     :return:
-        u_component_array, v_component_array, original_x_coord_array, original_y_coord_array
+        u_component_array, v_component_array, original_x_coord_array,
+        original_y_coord_array
 
     """
     assert (startFrame < stopFrame) and (stopFrame <= arr.shape[0])
@@ -288,9 +298,9 @@ def get_v0_plus_r_coordinates_cardinal(array_shape, v0_cord, r):
 def get_all_angles(u_array, v_array, v0_coord, resultsDict, r_max, r_step=1, r_min=1):
     """
     Gets the vector v0 at coordinate (v0_coord) from a velocity vector field. Grows the distance r from r_min to r_max
-    in incremets of r_step. For each distance r calculates the average of the (cos) angles between v0 and v0+r in the four
-    cardinal directions. The result is stored in a dictionary where the keys are distances and the values are lists of
-    average angles for that distance. The updated resultsDict is returned.
+    in increments of r_step. For each distance r calculates the average of the (cos) angles between v0 and v0+r in the
+    four cardinal directions. The result is stored in a dictionary where the keys are distances and the values are lists
+    of average angles for that distance. The updated resultsDict is returned.
 
 
     :param u_array:
@@ -393,7 +403,7 @@ def do_it_all(indir, fname, outdir,
     print("Working on: %s" % (fname))
     t0 = time.time()
 
-    with tiffile.TiffFile(indir+fname) as tif:
+    with tiffile.TiffFile(os.path.join(indir, fname)) as tif:
         arr = tif.asarray()
 
     arr = arr[0:maxFrameToAnalyze]
@@ -533,31 +543,17 @@ def do_it_all(indir, fname, outdir,
 
 
 
+dir = os.path.dirname(__file__)
+indir = os.path.join(dir, "testfile")
+outdir = os.path.join(dir, "output")
 
-
-
-# outdir = r"Q:\\PNAS revision data\\Analysis\\"
-# indir= r"Q:\\PNAS revision data\\"
-# files = ["160124_H2B_serum_3ml_T0_1h_Median_3_frames_RESCALE.tif",
-#          "160126_H2B_T0_1h_3ml_serum_Median_3_frames_RESCALE.tif",
-#          "160205_H2B_3ml_T0_1h_RESCALE_Median_3_frames.tif"]
-
-
-
-
-indir = "/Users/jens_e/Python_laboratory/Vector_visualizer/Data for analysis script/"
-outdir = "/Users/jens_e/Python_laboratory/Vector_visualizer/Data for analysis script/out/"
-#analysisfiles = ["test.tif"]
-#analysisfiles = os.listdir(indir)
-analysisfiles = ["160124_H2B_serum_3ml_T0_1h_Median_3_frames_RESCALE.tif",
-          "160126_H2B_T0_1h_3ml_serum_Median_3_frames_RESCALE.tif",
-          "160205_H2B_3ml_T0_1h_RESCALE_Median_3_frames.tif"]
+analysisfiles = ["Test_File.tif"]
 
 
 for fname in analysisfiles:
     dat = do_it_all(indir, fname, outdir,
                                                                           maxFrameToAnalyze=201,
-                                                                          px_resolution = 5.466,
+                                                                          px_resolution = 2.028,
                                                                           time_resolution = 5.0,
                                                                           r_max=300,
                                                                           r_step=1,
