@@ -347,9 +347,9 @@ def get_all_angles(u_array, v_array, v0_coord, resultsDict, r_max, r_step=1, r_m
                 c_vv = dot_products[c] / magnitudes[c]
                 resultsDict[r].append(c_vv)
 
-    for k, v in resultsDict.items():
-        if len(resultsDict[k]) == 0:
-            resultsDict.pop(k, None)  # No need to save empty data lists, it breaks the statistics
+    for key in resultsDict.keys():
+        if len(resultsDict[key]) == 0:
+            resultsDict.pop(key, None)  # No need to save empty data lists, it breaks the statistics
 
     return resultsDict
 
